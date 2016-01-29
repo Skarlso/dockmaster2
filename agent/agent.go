@@ -38,7 +38,7 @@ func init() {
 	flag.StringVar(&serverURL, "server", "http://localhost:8989", "The server uri where dockmaster is located.")
 	flag.StringVar(&agentID, "agent", "localhost", "The name of an Agent. Example: TestQA1.")
 	flag.IntVar(&refreshRate, "refresh", 60, "The rate at which this agent should check for changes in seconds.")
-	flag.IntVar(&expireAfterSeconds, "refresh", 60, "The rate at which data sent by this agent should expire in seconds.")
+	flag.IntVar(&expireAfterSeconds, "expireAfterSeconds", 60, "The rate at which data sent by this agent should expire in seconds.")
 
 	flag.Parse()
 }
