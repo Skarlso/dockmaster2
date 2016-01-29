@@ -50,7 +50,10 @@ func main() {
 		log.Println("Started listening... Refresh rate is :", refreshRate)
 		post := Post{AgentID: agentID, ExpiredAfterSeconds: expireAfterSeconds}
 		containers := []Containers{}
-		runningContainers, _ := client.ListContainers(docker.ListContainersOptions{All: false})
+		runningContainers, err := client.ListContainers(docker.ListContainersOptions{All: false})
+		if err != nil {
+			panic("Failed to connect to Docker Client." + err.Error())
+		}
 		for _, v := range runningContainers {
 			c := Containers{}
 			c.ID = v.ID
@@ -66,11 +69,11 @@ func main() {
 		postString, err := json.Marshal(post)
 		if err != nil {
 			log.Println("Error occured while trying ot marshal POST:", err.Error())
-			continue
 		}
 		req, err := http.NewRequest("POST", serverURL, bytes.NewBuffer(postString))
 		if err != nil {
 			log.Println("Failed to create post request... Trying again later.")
+			time.Sleep(time.Second * time.Duration(refreshRate))
 			continue
 		}
 
@@ -80,10 +83,11 @@ func main() {
 		resp, err := client.Do(req)
 		if err != nil {
 			log.Println("Failed to receive from server... Trying again later.")
+			time.Sleep(time.Second * time.Duration(refreshRate))
 			continue
 		}
 		defer resp.Body.Close()
-
+		//TODO: Verify the response
 		time.Sleep(time.Second * time.Duration(refreshRate))
 	}
 }
