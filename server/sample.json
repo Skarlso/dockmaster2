@@ -1,0 +1,17 @@
+{"agentid": "007","expireAfterSeconds": 300, "containers": [{"id": "cont1","name": "bla","command": "catalina.sh",	"port": "3321"}, {"id": "cont2","name": "bla2","command": "catalina2.sh","port": "3333"}]}
+
+{
+	"agentid": "007",
+	"expireAfterSeconds": 300,
+	"containers": [{
+		"id": "cont1",
+		"name": "bla",
+		"command": "catalina.sh",
+		"port": "3321"
+	}, {
+		"id": "cont2",
+		"name": "bla2",
+		"command": "catalina2.sh",
+		"port": "3333"
+	}]
+}
