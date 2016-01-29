@@ -23,7 +23,7 @@ type Containers struct {
 //Post represents a post to the server
 type Post struct {
 	AgentID             string       `json:"agentid"`
-	ExpiredAfterSeconds int          `json:"expiredAfterSeconds"`
+	ExpiredAfterSeconds int          `json:"expireAfterSeconds"`
 	Containers          []Containers `json:"containers"`
 }
 
