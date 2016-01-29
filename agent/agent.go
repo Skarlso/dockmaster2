@@ -6,6 +6,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -46,8 +47,9 @@ func init() {
 func main() {
 	endpoint := "unix:///var/run/docker.sock"
 	client, _ := docker.NewClient(endpoint)
+	log.Println("Started listening... Refresh rate is :", refreshRate)
 	for {
-		log.Println("Started listening... Refresh rate is :", refreshRate)
+		log.Println("Assembling Post...")
 		post := Post{AgentID: agentID, ExpiredAfterSeconds: expireAfterSeconds}
 		containers := []Containers{}
 		runningContainers, err := client.ListContainers(docker.ListContainersOptions{All: false})
@@ -59,7 +61,7 @@ func main() {
 			c.ID = v.ID
 			c.Name = strings.Join(v.Names, ",")
 			for _, p := range v.Ports {
-				c.Port += p.IP + ":" + p.Type
+				c.Port += p.IP + ":" + p.Type + ":" + strconv.Itoa(int(p.PrivatePort)) + ":" + strconv.Itoa(int(p.PublicPort))
 			}
 			c.Command = v.Command
 			containers = append(containers, c)
@@ -78,7 +80,7 @@ func main() {
 		}
 
 		req.Header.Set("Content-Type", "application/json")
-
+		log.Println("Posting JSON:", string(postString))
 		client := &http.Client{}
 		resp, err := client.Do(req)
 		if err != nil {
