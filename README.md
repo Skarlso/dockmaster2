@@ -20,6 +20,39 @@ Currently the Agent only reports about running containers. Other containers are 
 
 The frontend first needs to handle proper showing of the data that it gets.
 
+Install
+=======
+
+Install All dependencies
+
+```bash
+    go get -v ./...
+```
+
+Starting the server:
+
+```bash
+    cd server
+    go build # To build the project
+    ./server
+```
+
+Starting the agent:
+
+```bash
+    cd agent
+    go build # To build the project
+    ./agent # running it without flags will make it run with default values. For flags, please see the Agent's README.
+```
+
+Starting the frontend:
+
+```bash
+    cd frontend
+    go build # To build the project
+    ./frontend # The front-end is very basic. Defining a server is not optional. Currently it has to run where the server is running.
+```
+
 Current Look
 ------------
 
