@@ -70,7 +70,7 @@ func main() {
 		if err != nil {
 			log.Println("Error occured while trying ot marshal POST:", err.Error())
 		}
-		req, err := http.NewRequest("POST", serverURL, bytes.NewBuffer(postString))
+		req, err := http.NewRequest("POST", serverURL+"/api/1/add", bytes.NewBuffer(postString))
 		if err != nil {
 			log.Println("Failed to create post request... Trying again later.")
 			time.Sleep(time.Second * time.Duration(refreshRate))
