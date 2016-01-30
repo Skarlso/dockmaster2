@@ -3,7 +3,7 @@ Dockmaster
 
 Dockmaster who oversees the workings of containers throughout a network.
 
-Dockmaster is a overseer for all the containers running on all the servers. It's service discovery with containers. 
+Dockmaster is a overseer for all the containers running on all the servers. It's service discovery for containers. 
 
 The architecture of Dockmaster is simple.
 
