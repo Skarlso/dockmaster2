@@ -11,7 +11,11 @@ import (
 	"time"
 
 	"github.com/fsouza/go-dockerclient"
+	"github.com/gin-gonic/gin"
 )
+
+//APIBASE The base of the API that this agent provides
+const APIBASE = "/api/1"
 
 //Containers representing information about the running containers
 type Containers struct {
@@ -33,6 +37,7 @@ var (
 	agentID            string
 	refreshRate        int
 	expireAfterSeconds int
+	port               string
 )
 
 func init() {
@@ -40,11 +45,58 @@ func init() {
 	flag.StringVar(&agentID, "agent", "localhost", "The name of an Agent. Example: TestQA1.")
 	flag.IntVar(&refreshRate, "refresh", 60, "The rate at which this agent should check for changes in seconds.")
 	flag.IntVar(&expireAfterSeconds, "expireAfterSeconds", 60, "The rate at which data sent by this agent should expire in seconds.")
+	flag.StringVar(&port, "port", "9999", "The port number on which this agent is running on.")
 
 	flag.Parse()
+	go startDiscovering()
 }
 
 func main() {
+	router := gin.Default()
+	v1 := router.Group(APIBASE)
+	{
+		v1.POST("/order", orderContainer)
+	}
+	router.Run(":" + port)
+}
+
+func orderContainer(c *gin.Context) {
+	var errorMessage struct {
+		Error string `json:"error"`
+	}
+	var order struct {
+		Command     string `json:"command"`
+		ContainerID string `json:"id"`
+	}
+
+	err := c.BindJSON(&order)
+	if err != nil {
+		e := errorMessage
+		e.Error = "error occured while unmarshaling order:" + err.Error()
+		c.JSON(http.StatusBadRequest, e)
+		return
+	}
+
+	//reflect.ValueOf(&t).MethodByName("Foo").Call([]reflect.Value{})
+	endpoint := "unix:///var/run/docker.sock"
+	client, _ := docker.NewClient(endpoint)
+	runningContainers, err := client.ListContainers(docker.ListContainersOptions{All: true})
+
+	switch order.Command {
+	case "start":
+		for _, v := range runningContainers {
+			if v.ID == order.ContainerID {
+				client.StartContainer(order.ContainerID, &docker.HostConfig{})
+			}
+		}
+	case "stop":
+		for _, v := range runningContainers {
+			client.StopContainer(v.ID, 1)
+		}
+	}
+}
+
+func startDiscovering() {
 	endpoint := "unix:///var/run/docker.sock"
 	client, _ := docker.NewClient(endpoint)
 	log.Println("Started listening... Refresh rate is :", refreshRate)
