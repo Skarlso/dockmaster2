@@ -11,3 +11,4 @@ v0.1.0
  Todo:
  * Make agent two-way
  * A nicer front-end
+ * Implement tests
