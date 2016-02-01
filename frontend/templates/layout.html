@@ -9,32 +9,35 @@
         $(function() {
                     var moveLeft = 0;
                     var moveDown = 0;
-                    $('a#trigger').hover(function(e) {
-                        var data = JSON.parse($(this).parent().parent().attr('data-blah'));
+                    var display = true;
+                    $('a#trigger').click(function() {
+                        if ( display === true ) {
+                            var data = JSON.parse($(this).parent().parent().attr('data-blah'));
 
-                        console.log('http://localhost:8989/api/1/inspect/'+data.agentid+'/'+data.id)
+                            console.log('http://localhost:8989/api/1/inspect/'+data.agentid+'/'+data.id)
 
-                        $.ajax({
-                            url: 'http://localhost:8989/api/1/inspect/'+data.agentid+'/'+data.id,
-                            type: 'GET',
-                            dataType:"json",
-                            headers: {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "access-control-allow-origin, access-control-allow-headers, Authorization, Content-Type"},
-                            processData: false,
-                            crossDomain: true,
-                            success: function(data) {
-                                var json = JSON.stringify(data, null, 4)
-                                // console.log(json)
-                                $('div#pop-up').append(json)
-                            }
-                        });
+                            $.ajax({
+                                url: 'http://localhost:8989/api/1/inspect/'+data.agentid+'/'+data.id,
+                                type: 'GET',
+                                dataType:"json",
+                                headers: {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "access-control-allow-origin, access-control-allow-headers, Authorization, Content-Type"},
+                                processData: false,
+                                crossDomain: true,
+                                success: function(data) {
+                                    var json = JSON.stringify(data, null, 4)
+                                    // console.log(json)
+                                    $('div#pop-up').text(json)
+                                }
+                            });
 
-                        $('div#pop-up').show();
-                    }, function() {
-                        $('div#pop-up').hide();
-                    });
-                    $('a#trigger').mousemove(function(e) {
-                        $("div#pop-up").css('top', e.pageY + moveDown).css('left', e.pageX + moveLeft);
-                    });
+
+                            $('div#pop-up').show();
+                            display = false;
+                        } else if ( display === false ) {
+                            $('div#pop-up').hide();
+                            display = true;
+                        }
+                    })
                 });
     </script>
 </head>
