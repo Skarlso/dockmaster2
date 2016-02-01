@@ -9,4 +9,11 @@ v0.1.1
 v0.1.0
 ------
 
- * First draft
+ * Agent created
+ * Server created
+ * Front-end created
+
+ Todo:
+ * Make agent two-way
+ * A nicer front-end
+ * Implement tests
