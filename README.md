@@ -3,7 +3,7 @@ Dockmaster
 
 Dockmaster who oversees the workings of containers throughout a network.
 
-Dockmaster is a overseer for all the containers running on all the servers. It's service discovery for containers. 
+Dockmaster is a overseer for all the containers running on all the servers. It's service discovery for containers.
 
 The architecture of Dockmaster is simple.
 
@@ -60,4 +60,8 @@ Current Look
 
 The current look is a very simple table view:
 
-![Dockmaster](dockmaster.png)
+![Dockmaster](frontend1.png)
+
+After clicking inspect, a popup windows will provide more information about the container.
+
+![Popup](frontend2.png)
