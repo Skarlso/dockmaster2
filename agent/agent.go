@@ -137,6 +137,7 @@ func inspectContainer(c *gin.Context) {
 	// cID := c.Param("id")
 	// endpoint := "unix:///var/run/docker.sock"
 	// client, _ := docker.NewClient(endpoint)
+	c.JSON(http.StatusNotImplemented, nil)
 }
 
 func startDiscovering() {
