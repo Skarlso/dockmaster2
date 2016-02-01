@@ -4,20 +4,46 @@
     <meta charset="utf-8">
     <title>Dockermaster Page</title>
     <link rel="stylesheet" href="/static/css/main.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            var moveLeft = 0;
+            var moveDown = 0;
 
-    <script>
-        $(document).ready(function(){
-            $('[data-toggle="popover"]').popover();
+            $('a#trigger').hover(function(e) {
+                $('div#pop-up').show();
+                //.css('top', e.pageY + moveDown)
+                //.css('left', e.pageX + moveLeft)
+                //.appendTo('body');
+            }, function() {
+                $('div#pop-up').hide();
+            });
+
+            $('a#trigger').mousemove(function(e) {
+                $("div#pop-up").css('top', e.pageY + moveDown).css('left', e.pageX + moveLeft);
+            });
+
         });
+        // (function() {
+        //   var dockmaster = "http://localhost:8989/api/1/inspect/";
+        //   $.getJSON( flickerAPI, {
+        //     tags: "mount rainier",
+        //     tagmode: "any",
+        //     format: "json"
+        //   })
+        //     .done(function( data ) {
+        //       $.each( data.items, function( i, item ) {
+        //         $( "<img>" ).attr( "src", item.media.m ).appendTo( "#images" );
+        //         if ( i === 3 ) {
+        //           return false;
+        //         }
+        //       });
+        //     });
+        // })();
     </script>
 </head>
 <body>
-    <div class="container" id="pop-over">
-    </div>
+
     <table style="width:100%">
         {{range $agent := .}}
             <tr>
@@ -33,7 +59,11 @@
             {{range $cont := $agent.Containers}}
                 <tr>
                     <td>
-                        <a href="#" data-toggle="popover" title="Popover Header" data-content="Some content inside the popover">Inspect</a>
+                        <a href="#" id="trigger">Inspect</a>
+                        <div id="pop-up">
+                          <h3>Pop-up div Successfully Displayed</h3>
+                          Some more information here.
+                        </div>
                     </td>
                     <td>{{$cont.ID}}</td>
                     <td>{{$cont.Name}}</td>
