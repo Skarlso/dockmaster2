@@ -57,6 +57,8 @@ func main() {
 		v1.POST("/delete", deleteContainers)
 		v1.GET("/inspect/:agentID/:containerID", inspectContainer)
 		v1.OPTIONS("/inspect/:agentID/:containerID", preflight)
+		v1.POST("/stopAll", stopAll)
+		v1.OPTIONS("/stopAll", preflight)
 	}
 	router.Run(":8989")
 }
@@ -66,6 +68,26 @@ func preflight(c *gin.Context) {
 	// c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 	c.Header("Access-Control-Allow-Headers", "access-control-allow-origin, access-control-allow-headers, Authorization, Content-Type")
 	c.JSON(http.StatusOK, struct{}{})
+}
+
+func stopAll(c *gin.Context) {
+	var agentID struct {
+		AgentID string `json:"agentid"`
+	}
+	err := c.BindJSON(&agentID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, ErrorResponse{"error binding json: " + err.Error()})
+		return
+	}
+
+	a, err := mdb.GetAgent(agentID.AgentID)
+	resp, _ := http.Post("http://"+a.IP+":"+a.Port+"/"+APIBASE+"/stopAll", "application/json", nil)
+
+	if resp.StatusCode != 200 {
+		c.JSON(resp.StatusCode, resp.Body)
+	}
+
+	c.JSON(resp.StatusCode, Message{"All containers stopped."})
 }
 
 func inspectContainer(c *gin.Context) {
