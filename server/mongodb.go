@@ -64,6 +64,16 @@ func (mdb MongoDBConnection) Load() (a []Agent, err error) {
 	return a, err
 }
 
+//GetAgent retrieves one agent to perform an operation with
+func (mdb MongoDBConnection) GetAgent(agentID string) (a Agent, err error) {
+	mdb.session = mdb.GetSession()
+	defer mdb.session.Close()
+	c := mdb.session.DB("dockmaster").C("containers")
+
+	err = c.Find(bson.M{"agentid": agentID}).One(&a)
+	return a, err
+}
+
 //Delete bulk deletes containers
 func (mdb MongoDBConnection) Delete(a Agent) error {
 	mdb.session = mdb.GetSession()

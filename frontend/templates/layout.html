@@ -4,22 +4,64 @@
     <meta charset="utf-8">
     <title>Dockermaster Page</title>
     <link rel="stylesheet" href="/static/css/main.css">
+    <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            var moveLeft = 0;
+            var moveDown = 0;
+            var display = false;
+            $('a#trigger').click(function() {
+                var link = this,
+                    data = JSON.parse($(this).parent().parent().attr('link-data')),
+                    popupId = data.agentid+'-'+data.id,
+                    existingPopup = $('.popup#' +  popupId),
+                    independentPopup;
+
+                if (existingPopup.length > 0) {
+                      existingPopup.remove();
+                      return;
+                }
+
+                $('.popup').remove(); // delete any of the old popups
+                independentPopup = $('<div class="popup" id="' + popupId + '">')
+                console.log('http://localhost:8989/api/1/inspect/'+data.agentid+'/'+data.id)
+
+                $.ajax({
+                    url: 'http://localhost:8989/api/1/inspect/'+data.agentid+'/'+data.id,
+                    type: 'GET',
+                    dataType:"json",
+                    headers: {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "access-control-allow-origin, access-control-allow-headers, Authorization, Content-Type"},
+                    processData: false,
+                    crossDomain: true,
+                    success: function(data) {
+                        var json = JSON.stringify(data, null, 4)
+                        independentPopup.html("<pre >"+json+"</pre>");
+                        $(link).after(independentPopup);
+                    }
+                });
+            })
+        });
+    </script>
 </head>
 <body>
-    <!-- Hello, {{.}}! -->
+
     <table style="width:100%">
         {{range $agent := .}}
             <tr>
                 <td id="agent" align="center"><h1 style="text-align:center; font-family:verdana;">{{$agent.AgentID}}</h1></td>
             </tr>
             <tr>
+                <td id="header">Action</td>
                 <td id="header">ID</td>
                 <td id="header">Name</td>
                 <td id="header">Command</td>
                 <td id="header">Port</td>
             </tr>
             {{range $cont := $agent.Containers}}
-                <tr>
+                <tr link-data='{"agentid":"{{$agent.AgentID}}","id":"{{$cont.ID}}"}'>
+                    <td>
+                        <a href="#" id="trigger">Inspect</a>
+                    </td>
                     <td>{{$cont.ID}}</td>
                     <td>{{$cont.Name}}</td>
                     <td>{{$cont.RunningCmd}}</td>

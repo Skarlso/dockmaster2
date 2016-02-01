@@ -5,13 +5,18 @@ import (
 	"encoding/json"
 	"flag"
 	"log"
+	"net"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/fsouza/go-dockerclient"
+	"github.com/gin-gonic/gin"
 )
+
+//APIBASE The base of the API that this agent provides
+const APIBASE = "/api/1"
 
 //Containers representing information about the running containers
 type Containers struct {
@@ -25,6 +30,8 @@ type Containers struct {
 type Post struct {
 	AgentID             string       `json:"agentid"`
 	ExpiredAfterSeconds int          `json:"expireAfterSeconds"`
+	IPAddress           string       `json:"ip"`
+	Port                string       `json:"port"`
 	Containers          []Containers `json:"containers"`
 }
 
@@ -33,6 +40,7 @@ var (
 	agentID            string
 	refreshRate        int
 	expireAfterSeconds int
+	port               string
 )
 
 func init() {
@@ -40,11 +48,24 @@ func init() {
 	flag.StringVar(&agentID, "agent", "localhost", "The name of an Agent. Example: TestQA1.")
 	flag.IntVar(&refreshRate, "refresh", 60, "The rate at which this agent should check for changes in seconds.")
 	flag.IntVar(&expireAfterSeconds, "expireAfterSeconds", 60, "The rate at which data sent by this agent should expire in seconds.")
+	flag.StringVar(&port, "port", "9999", "The port number on which this agent is running on.")
 
 	flag.Parse()
+	go startDiscovering()
 }
 
 func main() {
+	router := gin.Default()
+	v1 := router.Group(APIBASE)
+	{
+		v1.POST("/stop", stopContainer)
+		v1.POST("/stopAll", stopAllContainers)
+		v1.GET("/inspect/:id", inspectContainer)
+	}
+	router.Run(":" + port)
+}
+
+func startDiscovering() {
 	endpoint := "unix:///var/run/docker.sock"
 	client, _ := docker.NewClient(endpoint)
 	log.Println("Started listening... Refresh rate is :", refreshRate)
@@ -67,7 +88,8 @@ func main() {
 			containers = append(containers, c)
 		}
 		post.Containers = containers
-
+		post.IPAddress = getLocalIP()
+		post.Port = port
 		postString, err := json.Marshal(post)
 		if err != nil {
 			log.Println("Error occured while trying ot marshal POST:", err.Error())
@@ -92,4 +114,22 @@ func main() {
 		//TODO: Verify the response
 		time.Sleep(time.Second * time.Duration(refreshRate))
 	}
+}
+
+func getLocalIP() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		log.Println("Couldn't determine ip address. Sending empty string. Error:", err.Error())
+		return ""
+	}
+
+	for _, a := range addrs {
+		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				return ipnet.IP.String()
+			}
+		}
+	}
+
+	return ""
 }
