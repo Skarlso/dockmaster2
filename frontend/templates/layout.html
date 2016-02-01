@@ -4,15 +4,27 @@
     <meta charset="utf-8">
     <title>Dockermaster Page</title>
     <link rel="stylesheet" href="/static/css/main.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function(){
+            $('[data-toggle="popover"]').popover();
+        });
+    </script>
 </head>
 <body>
-    <!-- Hello, {{.}}! -->
+    <div class="container" id="pop-over">
+    </div>
     <table style="width:100%">
         {{range $agent := .}}
             <tr>
                 <td id="agent" align="center"><h1 style="text-align:center; font-family:verdana;">{{$agent.AgentID}}</h1></td>
             </tr>
             <tr>
+                <td id="header">Action</td>
                 <td id="header">ID</td>
                 <td id="header">Name</td>
                 <td id="header">Command</td>
@@ -20,6 +32,9 @@
             </tr>
             {{range $cont := $agent.Containers}}
                 <tr>
+                    <td>
+                        <a href="#" data-toggle="popover" title="Popover Header" data-content="Some content inside the popover">Inspect</a>
+                    </td>
                     <td>{{$cont.ID}}</td>
                     <td>{{$cont.Name}}</td>
                     <td>{{$cont.RunningCmd}}</td>
