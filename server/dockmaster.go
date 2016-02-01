@@ -56,8 +56,16 @@ func main() {
 		v1.POST("/add", addContainers)
 		v1.POST("/delete", deleteContainers)
 		v1.GET("/inspect/:agentID/:containerID", inspectContainer)
+		v1.OPTIONS("/inspect/:agentID/:containerID", preflight)
 	}
 	router.Run(":8989")
+}
+
+func preflight(c *gin.Context) {
+	c.Header("Access-Control-Allow-Origin", "*")
+	// c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	c.Header("Access-Control-Allow-Headers", "access-control-allow-origin, access-control-allow-headers, Authorization, Content-Type")
+	c.JSON(http.StatusOK, struct{}{})
 }
 
 func inspectContainer(c *gin.Context) {
@@ -79,6 +87,7 @@ func inspectContainer(c *gin.Context) {
 		return
 	}
 
+	c.Header("Access-Control-Allow-Origin", "*")
 	c.JSON(http.StatusOK, container)
 }
 

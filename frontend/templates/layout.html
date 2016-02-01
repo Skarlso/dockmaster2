@@ -7,39 +7,35 @@
     <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
     <script type="text/javascript">
         $(function() {
-            var moveLeft = 0;
-            var moveDown = 0;
+                    var moveLeft = 0;
+                    var moveDown = 0;
+                    $('a#trigger').hover(function(e) {
+                        var data = JSON.parse($(this).parent().parent().attr('data-blah'));
 
-            $('a#trigger').hover(function(e) {
-                $('div#pop-up').show();
-                //.css('top', e.pageY + moveDown)
-                //.css('left', e.pageX + moveLeft)
-                //.appendTo('body');
-            }, function() {
-                $('div#pop-up').hide();
-            });
+                        console.log('http://localhost:8989/api/1/inspect/'+data.agentid+'/'+data.id)
 
-            $('a#trigger').mousemove(function(e) {
-                $("div#pop-up").css('top', e.pageY + moveDown).css('left', e.pageX + moveLeft);
-            });
+                        $.ajax({
+                            url: 'http://localhost:8989/api/1/inspect/'+data.agentid+'/'+data.id,
+                            type: 'GET',
+                            dataType:"json",
+                            headers: {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "access-control-allow-origin, access-control-allow-headers, Authorization, Content-Type"},
+                            processData: false,
+                            crossDomain: true,
+                            success: function(data) {
+                                var json = JSON.stringify(data, null, 4)
+                                // console.log(json)
+                                $('div#pop-up').append(json)
+                            }
+                        });
 
-        });
-        // (function() {
-        //   var dockmaster = "http://localhost:8989/api/1/inspect/";
-        //   $.getJSON( flickerAPI, {
-        //     tags: "mount rainier",
-        //     tagmode: "any",
-        //     format: "json"
-        //   })
-        //     .done(function( data ) {
-        //       $.each( data.items, function( i, item ) {
-        //         $( "<img>" ).attr( "src", item.media.m ).appendTo( "#images" );
-        //         if ( i === 3 ) {
-        //           return false;
-        //         }
-        //       });
-        //     });
-        // })();
+                        $('div#pop-up').show();
+                    }, function() {
+                        $('div#pop-up').hide();
+                    });
+                    $('a#trigger').mousemove(function(e) {
+                        $("div#pop-up").css('top', e.pageY + moveDown).css('left', e.pageX + moveLeft);
+                    });
+                });
     </script>
 </head>
 <body>
@@ -57,12 +53,11 @@
                 <td id="header">Port</td>
             </tr>
             {{range $cont := $agent.Containers}}
-                <tr>
+                <tr data-blah='{"agentid":"{{$agent.AgentID}}","id":"{{$cont.ID}}"}'>
                     <td>
                         <a href="#" id="trigger">Inspect</a>
                         <div id="pop-up">
-                          <h3>Pop-up div Successfully Displayed</h3>
-                          Some more information here.
+                          <h3>Inspect</h3>
                         </div>
                     </td>
                     <td>{{$cont.ID}}</td>
