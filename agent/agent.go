@@ -70,26 +70,17 @@ func stopContainer(c *gin.Context) {
 	//reflect.ValueOf(&t).MethodByName("Foo").Call([]reflect.Value{})
 	endpoint := "unix:///var/run/docker.sock"
 	client, _ := docker.NewClient(endpoint)
-	runningContainers, err := client.ListContainers(docker.ListContainersOptions{All: false})
 
-	for _, v := range runningContainers {
-		if v.ID == container.ID {
-			err = client.StopContainer(v.ID, 1)
-			if err != nil {
-				e := ErrorResponse{}
-				e.ErrorMessage = "error stopping containers:" + err.Error()
-				c.JSON(http.StatusInternalServerError, e)
-				return
-			}
-			m := Message{}
-			m.Message = "continer stopped successfully"
-			c.JSON(http.StatusOK, m)
-		}
+	err := client.StopContainer(container.ID, 1)
+	if err != nil {
+		e := ErrorResponse{}
+		e.ErrorMessage = "error stopping containers:" + err.Error()
+		c.JSON(http.StatusInternalServerError, e)
+		return
 	}
-
-	e := ErrorResponse{}
-	e.ErrorMessage = "container could not be found!"
-	c.JSON(http.StatusNotFound, e)
+	m := Message{}
+	m.Message = "continer stopped successfully"
+	c.JSON(http.StatusOK, m)
 }
 
 func stopAllContainers(c *gin.Context) {
@@ -134,10 +125,16 @@ func stopAllContainers(c *gin.Context) {
 }
 
 func inspectContainer(c *gin.Context) {
-	// cID := c.Param("id")
-	// endpoint := "unix:///var/run/docker.sock"
-	// client, _ := docker.NewClient(endpoint)
-	c.JSON(http.StatusNotImplemented, nil)
+	cID := c.Param("id")
+	endpoint := "unix:///var/run/docker.sock"
+	client, _ := docker.NewClient(endpoint)
+	con, err := client.InspectContainer(cID)
+	if err != nil {
+		e := ErrorResponse{"error while trying to inspect container:" + err.Error()}
+		c.JSON(http.StatusInternalServerError, e)
+	}
+
+	c.JSON(http.StatusOK, con)
 }
 
 func startDiscovering() {
