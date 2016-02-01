@@ -55,45 +55,88 @@ func main() {
 	router := gin.Default()
 	v1 := router.Group(APIBASE)
 	{
-		v1.POST("/order", orderContainer)
+		v1.POST("/stop", stopContainer)
+		v1.POST("/stopAll", stopAllContainers)
+		v1.GET("/inspect/:id", inspectContainer)
 	}
 	router.Run(":" + port)
 }
 
-func orderContainer(c *gin.Context) {
-	var errorMessage struct {
-		Error string `json:"error"`
-	}
-	var order struct {
-		Command     string `json:"command"`
-		ContainerID string `json:"id"`
-	}
-
-	err := c.BindJSON(&order)
-	if err != nil {
-		e := errorMessage
-		e.Error = "error occured while unmarshaling order:" + err.Error()
-		c.JSON(http.StatusBadRequest, e)
-		return
+func stopContainer(c *gin.Context) {
+	var container struct {
+		ID string `json:"id"`
 	}
 
 	//reflect.ValueOf(&t).MethodByName("Foo").Call([]reflect.Value{})
 	endpoint := "unix:///var/run/docker.sock"
 	client, _ := docker.NewClient(endpoint)
-	runningContainers, err := client.ListContainers(docker.ListContainersOptions{All: true})
+	runningContainers, err := client.ListContainers(docker.ListContainersOptions{All: false})
 
-	switch order.Command {
-	case "start":
-		for _, v := range runningContainers {
-			if v.ID == order.ContainerID {
-				client.StartContainer(order.ContainerID, &docker.HostConfig{})
+	for _, v := range runningContainers {
+		if v.ID == container.ID {
+			err = client.StopContainer(v.ID, 1)
+			if err != nil {
+				e := ErrorResponse{}
+				e.ErrorMessage = "error stopping containers:" + err.Error()
+				c.JSON(http.StatusInternalServerError, e)
+				return
 			}
-		}
-	case "stop":
-		for _, v := range runningContainers {
-			client.StopContainer(v.ID, 1)
+			m := Message{}
+			m.Message = "continer stopped successfully"
+			c.JSON(http.StatusOK, m)
 		}
 	}
+
+	e := ErrorResponse{}
+	e.ErrorMessage = "container could not be found!"
+	c.JSON(http.StatusNotFound, e)
+}
+
+func stopAllContainers(c *gin.Context) {
+
+	var stopErrors [][]string
+	for i := range stopErrors {
+		stopErrors[i] = make([]string, 0)
+	}
+	//reflect.ValueOf(&t).MethodByName("Foo").Call([]reflect.Value{})
+	endpoint := "unix:///var/run/docker.sock"
+	client, _ := docker.NewClient(endpoint)
+	runningContainers, err := client.ListContainers(docker.ListContainersOptions{All: false})
+
+	if err != nil {
+		e := ErrorResponse{}
+		e.ErrorMessage = "error getting all containers:" + err.Error()
+		c.JSON(http.StatusInternalServerError, e)
+		return
+	}
+
+	for _, v := range runningContainers {
+		err := client.StopContainer(v.ID, 1)
+		if err != nil {
+			stopErrors = append(stopErrors, v.Names)
+		}
+	}
+
+	if len(stopErrors) != 0 {
+		var errCon string
+		for _, v := range stopErrors {
+			errCon += "[" + strings.Join(v, "|") + "]"
+		}
+		e := ErrorResponse{}
+		e.ErrorMessage = "error stopping containers:" + errCon
+		c.JSON(http.StatusInternalServerError, e)
+		return
+	}
+
+	m := Message{}
+	m.Message = "all containers successfully stopped"
+	c.JSON(http.StatusOK, m)
+}
+
+func inspectContainer(c *gin.Context) {
+	// cID := c.Param("id")
+	// endpoint := "unix:///var/run/docker.sock"
+	// client, _ := docker.NewClient(endpoint)
 }
 
 func startDiscovering() {
