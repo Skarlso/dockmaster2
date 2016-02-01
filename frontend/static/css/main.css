@@ -10,6 +10,7 @@ table {
 th, td {
     text-align: left;
     padding: 8px;
+    color: red
 }
 
 td#agent {
@@ -30,9 +31,8 @@ th {
     color: white;
 }
 
-div#pop-up {
-    display: none;
-    width: 280px;
+div.popup {
+    width: 700px;
     padding: 10px;
     background: #eeeeee;
     color: #000000;

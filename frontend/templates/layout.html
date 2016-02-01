@@ -7,38 +7,40 @@
     <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
     <script type="text/javascript">
         $(function() {
-                    var moveLeft = 0;
-                    var moveDown = 0;
-                    var display = true;
-                    $('a#trigger').click(function() {
-                        if ( display === true ) {
-                            var data = JSON.parse($(this).parent().parent().attr('data-blah'));
+            var moveLeft = 0;
+            var moveDown = 0;
+            var display = false;
+            $('a#trigger').click(function() {
+                var link = this,
+                    data = JSON.parse($(this).parent().parent().attr('link-data')),
+                    popupId = data.agentid+'-'+data.id,
+                    existingPopup = $('.popup#' +  popupId),
+                    independentPopup;
 
-                            console.log('http://localhost:8989/api/1/inspect/'+data.agentid+'/'+data.id)
+                if (existingPopup.length > 0) {
+                      existingPopup.remove();
+                      return;
+                }
 
-                            $.ajax({
-                                url: 'http://localhost:8989/api/1/inspect/'+data.agentid+'/'+data.id,
-                                type: 'GET',
-                                dataType:"json",
-                                headers: {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "access-control-allow-origin, access-control-allow-headers, Authorization, Content-Type"},
-                                processData: false,
-                                crossDomain: true,
-                                success: function(data) {
-                                    var json = JSON.stringify(data, null, 4)
-                                    // console.log(json)
-                                    $('div#pop-up').text(json)
-                                }
-                            });
+                $('.popup').remove(); // delete any of the old popups
+                independentPopup = $('<div class="popup" id="' + popupId + '">')
+                console.log('http://localhost:8989/api/1/inspect/'+data.agentid+'/'+data.id)
 
-
-                            $('div#pop-up').show();
-                            display = false;
-                        } else if ( display === false ) {
-                            $('div#pop-up').hide();
-                            display = true;
-                        }
-                    })
+                $.ajax({
+                    url: 'http://localhost:8989/api/1/inspect/'+data.agentid+'/'+data.id,
+                    type: 'GET',
+                    dataType:"json",
+                    headers: {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "access-control-allow-origin, access-control-allow-headers, Authorization, Content-Type"},
+                    processData: false,
+                    crossDomain: true,
+                    success: function(data) {
+                        var json = JSON.stringify(data, null, 4)
+                        independentPopup.html("<pre >"+json+"</pre>");
+                        $(link).after(independentPopup);
+                    }
                 });
+            })
+        });
     </script>
 </head>
 <body>
@@ -56,12 +58,9 @@
                 <td id="header">Port</td>
             </tr>
             {{range $cont := $agent.Containers}}
-                <tr data-blah='{"agentid":"{{$agent.AgentID}}","id":"{{$cont.ID}}"}'>
+                <tr link-data='{"agentid":"{{$agent.AgentID}}","id":"{{$cont.ID}}"}'>
                     <td>
                         <a href="#" id="trigger">Inspect</a>
-                        <div id="pop-up">
-                          <h3>Inspect</h3>
-                        </div>
                     </td>
                     <td>{{$cont.ID}}</td>
                     <td>{{$cont.Name}}</td>
