@@ -47,7 +47,6 @@ func init() {
 	}()
 }
 
-// The main function which starts the rpg
 func main() {
 	router := gin.Default()
 	v1 := router.Group(APIBASE)
