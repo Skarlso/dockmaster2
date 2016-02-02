@@ -65,7 +65,7 @@ func main() {
 func preflight(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
 	// c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-	c.Header("Access-Control-Allow-Headers", "access-control-allow-origin, access-control-allow-headers, Authorization, Content-Type")
+	c.Header("Access-Control-Allow-Headers", "access-control-allow-origin, access-control-allow-headers")
 	c.JSON(http.StatusOK, struct{}{})
 }
 

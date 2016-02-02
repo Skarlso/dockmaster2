@@ -30,9 +30,8 @@
                     url: 'http://localhost:8989/api/1/inspect/'+data.agentid+'/'+data.id,
                     type: 'GET',
                     dataType:"json",
-                    headers: {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "access-control-allow-origin, access-control-allow-headers, Authorization, Content-Type"},
+                    headers: {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "access-control-allow-origin, access-control-allow-headers"},
                     processData: false,
-                    crossDomain: true,
                     success: function(data) {
                         var json = JSON.stringify(data, null, 4)
                         independentPopup.html("<pre >"+json+"</pre>");
