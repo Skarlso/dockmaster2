@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -23,8 +24,15 @@ type Agent struct {
 	Containers         []Container `json:"containers"`
 }
 
+var server string
+
+func init() {
+	flag.StringVar(&server, "server", "http://localhost:8989", "Full URL for the server.")
+	flag.Parse()
+}
+
 func index(w http.ResponseWriter, r *http.Request) {
-	resp, _ := http.Get("http://localhost:8989/api/1/list")
+	resp, _ := http.Get(server + "/api/1/list")
 	agents := []Agent{}
 	decoder := json.NewDecoder(resp.Body)
 	err := decoder.Decode(&agents)
