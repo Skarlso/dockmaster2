@@ -65,3 +65,18 @@ The current look is a very simple table view:
 After clicking inspect, a popup windows will provide more information about the container.
 
 ![Popup](frontend2.png)
+
+Bulk Stop
+---------
+
+Once you have an agent up and running, it is now possible to stop all running containers for that agent by clicking the 'Stop All' button next to the Agent.
+
+![Stop All](frontend3.png)
+
+The agent takes a minute to update its status, so the stopped container state, right now, will not be refreshed immediately. A message is received if the operation was successful or not. This, right now, is only displayed in the console output.
+
+![Message](frontend4.png)
+
+After the agent has refreshed its status, it can be seen that all the containers have been shutdown.
+
+![No Containers Running For Agent](frontend5.png)
