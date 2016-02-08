@@ -50,8 +50,7 @@
                 processData: false,
                 success: function(data) {
                     var json = JSON.stringify(data, null, 4)
-                    independentPopup.html("<pre >"+json+"</pre>");
-                    $(link).after(independentPopup);
+                    console.log(json)
                 }
             });
         }

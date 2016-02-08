@@ -82,8 +82,11 @@ func stopAll(c *gin.Context) {
 	a, err := mdb.GetAgent(agentID.AgentID)
 	resp, _ := http.Post("http://"+a.IP+":"+a.Port+"/"+APIBASE+"/stopAll", "application/json", nil)
 
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Access-Control-Allow-Headers", "access-control-allow-origin, access-control-allow-headers")
 	if resp.StatusCode != 200 {
 		c.JSON(resp.StatusCode, resp.Body)
+		return
 	}
 
 	c.JSON(resp.StatusCode, Message{"All containers stopped."})
