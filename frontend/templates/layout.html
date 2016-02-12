@@ -54,6 +54,20 @@
                 }
             });
         }
+        function stop(agentid, contid) {
+            $.ajax({
+                url: 'http://localhost:8989/api/1/stop/'+agentid,
+                type: 'POST',
+                dataType:"json",
+                data:'{"id":"'+contid+'"}',
+                headers: {"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "access-control-allow-origin, access-control-allow-headers"},
+                processData: false,
+                success: function(data) {
+                    var json = JSON.stringify(data, null, 4)
+                    console.log(json)
+                }
+            });
+        }
     </script>
 </head>
 <body>
@@ -75,6 +89,7 @@
                 <tr link-data='{"agentid":"{{$agent.AgentID}}","id":"{{$cont.ID}}"}'>
                     <td>
                         <a href="#" id="trigger">Inspect</a>
+                        <input type="button" value="Stop" onclick="stop('{{$agent.AgentID}}', '{{$cont.ID}}')">
                     </td>
                     <td>{{$cont.ID}}</td>
                     <td>{{$cont.Name}}</td>
