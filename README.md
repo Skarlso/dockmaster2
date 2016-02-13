@@ -80,3 +80,7 @@ The agent takes a minute to update its status, so the stopped container state, r
 After the agent has refreshed its status, it can be seen that all the containers have been shutdown.
 
 ![No Containers Running For Agent](frontend5.png)
+
+Stopping a single container is now easily achieved with the click of a button next to the Inspect link.
+
+![Stopping a single Container](frontend6.png)
