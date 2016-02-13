@@ -1,4 +1,4 @@
 Frontend
 ========
 
-A very rudimentary frontend for information stored by dockmaster server.
+A very rudimentary front-end for information stored by Dockmaster server.
