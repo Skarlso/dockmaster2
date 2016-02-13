@@ -13,11 +13,18 @@ func stopContainer(c *gin.Context) {
 		ID string `json:"id"`
 	}
 
+	err := c.BindJSON(&container)
+	if err != nil {
+		e := ErrorResponse{}
+		e.ErrorMessage = "error parsing json body:" + err.Error()
+		c.JSON(http.StatusInternalServerError, e)
+		return
+	}
 	//reflect.ValueOf(&t).MethodByName("Foo").Call([]reflect.Value{})
 	endpoint := "unix:///var/run/docker.sock"
 	client, _ := docker.NewClient(endpoint)
 
-	err := client.StopContainer(container.ID, 1)
+	err = client.StopContainer(container.ID, 10)
 	if err != nil {
 		e := ErrorResponse{}
 		e.ErrorMessage = "error stopping containers:" + err.Error()
