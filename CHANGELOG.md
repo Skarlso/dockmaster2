@@ -1,6 +1,9 @@
 Changes to Dockmaster
 =====================
 
+v0.2.1
+* Front-end adjusted to contain the new abilities of the Agent
+
 v0.2.0
 * Agent is now two-way. It can inspect containers and perform basic operations on it
 * Inspect is available, others are under development
