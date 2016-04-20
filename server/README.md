@@ -30,9 +30,12 @@ In a next version perhaps the change will only be applied if there is actual cha
 For now, the server provides these end-points:
 
 ```bash
-GET    /api/1/list               --> main.listContainers (3 handlers)
-POST   /api/1/add                --> main.addContainers (3 handlers)
-POST   /api/1/delete             --> main.deleteContainers (3 handlers)
+[GIN-debug] GET    /api/1/list               --> main.listContainers (3 handlers)
+[GIN-debug] POST   /api/1/add                --> main.addContainers (3 handlers)
+[GIN-debug] POST   /api/1/delete             --> main.deleteContainers (3 handlers)
+[GIN-debug] GET    /api/1/inspect/:agentID/:containerID --> main.inspectContainer (3 handlers)
+[GIN-debug] POST   /api/1/stopAll            --> main.stopAll (3 handlers)
+[GIN-debug] POST   /api/1/stop/:agentID      --> main.stop (3 handlers)
 ```
 
 The ```delete``` however, is not used at the moment.
